@@ -1,0 +1,34 @@
+{
+  "name": "stackfolio-cdk",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "cdk": "cdk",
+    "synth": "cdk synth",
+    "synth:alpha": "cdk synth --context stage=alpha",
+    "synth:beta": "cdk synth --context stage=beta",
+    "synth:gamma": "cdk synth --context stage=gamma",
+    "deploy:alpha": "cdk deploy --all --context stage=alpha --require-approval never",
+    "deploy:beta": "cdk deploy --all --context stage=beta --require-approval never",
+    "deploy:gamma": "cdk deploy --all --context stage=gamma --require-approval never",
+    "diff:alpha": "cdk diff --all --context stage=alpha",
+    "diff:beta": "cdk diff --all --context stage=beta",
+    "diff:gamma": "cdk diff --all --context stage=gamma",
+    "destroy:alpha": "cdk destroy --all --context stage=alpha",
+    "destroy:beta": "cdk destroy --all --context stage=beta",
+    "destroy:gamma": "cdk destroy --all --context stage=gamma"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "aws-cdk": "^2.110.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.110.0",
+    "constructs": "^10.3.0",
+    "source-map-support": "^0.5.21"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "name": "ai-portfolio-backend",
+  "version": "1.0.0",
+  "description": "Backend Lambda functions for AI Portfolio Platform",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "lint": "eslint src/**/*.ts --fix",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "deploy:alpha": "npm run build && cd cdk && npm run deploy:alpha",
+    "deploy:beta": "npm run build && cd cdk && npm run deploy:beta",
+    "deploy:gamma": "npm run build && cd cdk && npm run deploy:gamma"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.600.0",
+    "@aws-sdk/client-textract": "^3.600.0",
+    "@aws-sdk/client-rekognition": "^3.600.0",
+    "@aws-sdk/client-bedrock-runtime": "^3.600.0",
+    "@aws-sdk/s3-request-presigner": "^3.600.0",
+    "@aws-sdk/client-cloudfront": "^3.600.0",
+    "pdf-parse": "^1.1.1",
+    "sharp": "^0.33.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/aws-lambda": "^8.10.140",
+    "@types/jest": "^29.5.0",
+    "jest": "^29.7.0",
+    "typescript": "^5.5.0",
+    "ts-jest": "^29.2.0"
+  }
+}

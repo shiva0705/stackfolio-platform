@@ -1,0 +1,107 @@
+name: Backend CI/CD
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'shared/**'
+      - '.github/workflows/backend-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - 'shared/**'
+
+env:
+  AWS_REGION: us-east-1
+  NODE_VERSION: '20'
+
+jobs:
+  test:
+    name: Test Backend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Run linter
+        working-directory: backend
+        run: npm run lint
+      
+      - name: Run type check
+        working-directory: backend
+        run: npm run type-check
+      
+      - name: Run unit tests
+        working-directory: backend
+        run: npm test -- --coverage
+      
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./backend/coverage/lcov.info
+          flags: backend
+
+  deploy-beta:
+    name: Deploy to Beta
+    needs: test
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: beta
+      url: https://beta.ai-portfolio.example.com
+    
+    permissions:
+      id-token: write  # For OIDC
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN_BETA }}
+          aws-region: ${{ env.AWS_REGION }}
+      
+      - name: Install dependencies
+        working-directory: backend
+        run: npm ci
+      
+      - name: Build Lambda functions
+        working-directory: backend
+        run: npm run build
+      
+      - name: CDK Deploy Beta
+        working-directory: backend/cdk
+        run: |
+          npm ci
+          npx cdk deploy --all \
+            --context stage=beta \
+            --require-approval never \
+            --outputs-file outputs-beta.json
+      
+      - name: Upload deployment outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: cdk-outputs-beta
+          path: backend/cdk/outputs-beta.json
+          retention-days: 30
